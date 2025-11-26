@@ -48,15 +48,30 @@ class RemoveShipData
 			 $transactions = $this->transactionFactory->create()->getCollection()->addFieldToSelect('id')->addFieldToSelect('label_file')->addFieldToSelect('created_at');
 			 $transactions->addFieldToFilter('created_at', ['lteq' => $days_ago]);
 			 $data = $transactions->getData();
-			 foreach($data as $shipdata){
-			 $label_file = $shipdata['label_file'];
-			 $id = $shipdata['id'];
-			 $file_to_delete = BP.'/media'.$label_file;
-			 $this->deleteRows($id);
-			if(file_exists($file_to_delete)){
-				unlink($file_to_delete);
+			 $allowedDir = BP . '/media/'; // Only allow deletion in media folder
+
+			foreach ($data as $shipdata) {
+				$labelFile = $shipdata['label_file'] ?? '';
+				$id = $shipdata['id'] ?? null;
+
+				if (!$labelFile || !$id) {
+					continue; // Skip invalid entries
+				}
+
+				// Sanitize filename
+				$fileName = basename($labelFile); // prevents directory traversal
+				$fileToDelete = $allowedDir . $fileName;
+
+				// Ensure file exists and is inside allowed directory
+				if (is_file($fileToDelete) && strpos(realpath($fileToDelete), realpath($allowedDir)) === 0) {
+					// Delete the file
+					unlink($fileToDelete);
+				}
+
+				// Delete row from DB (assuming deleteRows is safe)
+				$this->deleteRows($id);
 			}
-		}
+
 		}else{
 			echo "Enable Remove Lables";
 			
