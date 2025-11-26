@@ -66,21 +66,39 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     public function validate($data = null)
-    {
-        try {
-            $t = ($data !== null) ? $data : $this->scopeConfig->getValue("carriers/smroyalmail/product_key");
-            $iv = substr($t, 0, 16);
-            $_s = substr($t, 16);
-            $pdt = openssl_decrypt(base64_decode($_s), "AES-256-CBC",
-                hash('sha512', $this->scopeConfig->getValue("carriers/smroyalmail/smdata")), 0, $iv);
-            return (strpos($this->scopeConfig->getValue(\Magento\Store\Model\Store::XML_PATH_UNSECURE_BASE_URL,
-                                    \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT),
-                            $pdt) !== false) ? true : false;
-        } catch (\Exception $e) {
-            return false;
-        }
-		
-		//return true;
-    }
+	{
+		try {
+			$t = ($data !== null) ? $data : $this->scopeConfig->getValue(
+				"carriers/smroyalmail/product_key"
+			);
+
+			$iv = substr($t, 0, 16);
+			$_s = substr($t, 16);
+
+			$decrypted = openssl_decrypt(
+				base64_decode($_s),
+				"AES-256-CBC",
+				hash('sha512', $this->scopeConfig->getValue("carriers/smroyalmail/smdata")),
+				0,
+				$iv
+			);
+
+			// Handle the failure case explicitly
+			if ($decrypted === false) {
+				// Decryption failed
+				return false;
+			}
+
+			$baseUrl = $this->scopeConfig->getValue(
+				\Magento\Store\Model\Store::XML_PATH_UNSECURE_BASE_URL,
+				\Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT
+			);
+
+			return (strpos($baseUrl, $decrypted) !== false);
+		} catch (\Exception $e) {
+			return false;
+		}
+	}
+
 
 }
