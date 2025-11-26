@@ -48,27 +48,20 @@ class RemoveShipData
 			 $transactions = $this->transactionFactory->create()->getCollection()->addFieldToSelect('id')->addFieldToSelect('label_file')->addFieldToSelect('created_at');
 			 $transactions->addFieldToFilter('created_at', ['lteq' => $days_ago]);
 			 $data = $transactions->getData();
-			 $allowedDir = BP . '/media/'; // Only allow deletion in media folder
+			 $allowedDir = BP . '/media/';
 
 			foreach ($data as $shipdata) {
 				$labelFile = $shipdata['label_file'] ?? '';
 				$id = $shipdata['id'] ?? null;
 
 				if (!$labelFile || !$id) {
-					continue; // Skip invalid entries
+					continue;
 				}
 
-				// Sanitize filename
-				$fileName = basename($labelFile); // prevents directory traversal
-				$fileToDelete = $allowedDir . $fileName;
+				// Call the safe delete helper
+				$this->safeDeleteFile($labelFile, $allowedDir);
 
-				// Ensure file exists and is inside allowed directory
-				if (is_file($fileToDelete) && strpos(realpath($fileToDelete), realpath($allowedDir)) === 0) {
-					// Delete the file
-					unlink($fileToDelete);
-				}
-
-				// Delete row from DB (assuming deleteRows is safe)
+				// Delete the DB row
 				$this->deleteRows($id);
 			}
 
@@ -77,6 +70,31 @@ class RemoveShipData
 			
 		}
 	}
+	
+	protected function safeDeleteFile(string $filePath, string $allowedDir): bool
+	{
+		// Sanitize file name
+		$fileName = basename($filePath);
+
+		// Construct full path
+		$fullPath = rtrim($allowedDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $fileName;
+
+		// Ensure file exists and is inside allowed directory
+		if (!is_file($fullPath)) {
+			return false; // nothing to delete
+		}
+
+		$realPath = realpath($fullPath);
+		$realBase = realpath($allowedDir);
+
+		if ($realPath === false || strpos($realPath, $realBase) !== 0) {
+			return false; // outside allowed dir, do not delete
+		}
+
+		// Now delete safely
+		return unlink($realPath);
+	}
+
 	
 	public function deleteRows($entity_id){
 			$transactions = $this->transactionFactory->create()->load($entity_id);
