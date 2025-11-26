@@ -91,7 +91,7 @@ class PrintAllLabels extends \Magento\Backend\App\Action
 		}
 		if (shell_exec("$ghostScript_Path --version")){
 			$cmd = "$ghostScript_Path -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$output_file $labels";
-			shell_exec($cmd);
+			$output = shell_exec($cmd);
 			$filepath = BP.DIRECTORY_SEPARATOR.'pub'.DIRECTORY_SEPARATOR.'media'.DIRECTORY_SEPARATOR.'sm_royalmail'.DIRECTORY_SEPARATOR.'ShippingLabels.pdf';
 			$downloadedFileName = 'ShippingLabels.pdf';
 			$content['type'] = 'filename';
