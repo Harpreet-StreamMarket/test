@@ -214,7 +214,7 @@ define(['prototype'], function () {
                             response = response.evalJSON();
 
                             if (response.error) {
-                                this.messages.show().innerHTML = response.message;
+                                this.messages.show().textContent = response.message;
                             } else if (response.ok && Object.isFunction(this.labelCreatedCallback)) {
                                 this.labelCreatedCallback(response);
 								
