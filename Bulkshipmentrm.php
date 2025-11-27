@@ -3,6 +3,7 @@
 namespace StreamMarket\RoyalMailShipping\Controller\Adminhtml\MassAction;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Symfony\Component\Process\Process;
 
 class Bulkshipmentrm extends \Magento\Sales\Controller\Adminhtml\Order\AbstractMassAction
 {
@@ -102,14 +103,24 @@ class Bulkshipmentrm extends \Magento\Sales\Controller\Adminhtml\Order\AbstractM
 				}
 		}
 		if (shell_exec("$ghostScript_Path --version")){
-			$cmd = sprintf(
-				'%s -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=%s %s',
-				escapeshellarg($ghostScript_Path),
-				escapeshellarg($output_file),
-				escapeshellarg($labels)
-			);
+			$cmd = [
+				$ghostScript_Path,
+				'-q',
+				'-dNOPAUSE',
+				'-dBATCH',
+				'-sDEVICE=pdfwrite',
+				'-sOutputFile=' . $output_file,
+				$labels
+			];
 
-			$output = shell_exec($cmd);
+			$process = new Process($cmd);
+			$process->run();
+
+			if (!$process->isSuccessful()) {
+				throw new \RuntimeException($process->getErrorOutput());
+			}
+
+			$output = $process->getOutput();
 			$filepath = BP.DIRECTORY_SEPARATOR.'pub'.DIRECTORY_SEPARATOR.'media'.DIRECTORY_SEPARATOR.'sm_royalmail'.DIRECTORY_SEPARATOR.'ShippingLabels.pdf';
 			$downloadedFileName = 'ShippingLabels.pdf';
 			$content['type'] = 'filename';
