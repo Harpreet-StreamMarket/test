@@ -15,6 +15,7 @@ namespace StreamMarket\RoyalMailShipping\Controller\Adminhtml\Mass;
 use Magento\Shipping\Model\Shipping\LabelGenerator;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Symfony\Component\Process\Process;
 
 /**
  * Description of PrintAllLabels
@@ -91,7 +92,24 @@ class PrintAllLabels extends \Magento\Backend\App\Action
 		}
 		if (shell_exec("$ghostScript_Path --version")){
 			$cmd = "$ghostScript_Path -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$output_file $labels";
-			$output = shell_exec($cmd);
+			$cmd = [
+				$ghostScript_Path,
+				'-q',
+				'-dNOPAUSE',
+				'-dBATCH',
+				'-sDEVICE=pdfwrite',
+				'-sOutputFile=' . $output_file,
+				$labels
+			];
+			$process = new Process($cmd);
+			$process->run();
+			
+			if (!$process->isSuccessful()) {
+				throw new \RuntimeException($process->getErrorOutput());
+			}
+
+			$output = $process->getOutput();
+			
 			$filepath = BP.DIRECTORY_SEPARATOR.'pub'.DIRECTORY_SEPARATOR.'media'.DIRECTORY_SEPARATOR.'sm_royalmail'.DIRECTORY_SEPARATOR.'ShippingLabels.pdf';
 			$downloadedFileName = 'ShippingLabels.pdf';
 			$content['type'] = 'filename';
