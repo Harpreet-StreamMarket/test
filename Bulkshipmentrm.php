@@ -102,7 +102,13 @@ class Bulkshipmentrm extends \Magento\Sales\Controller\Adminhtml\Order\AbstractM
 				}
 		}
 		if (shell_exec("$ghostScript_Path --version")){
-			$cmd = "$ghostScript_Path -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$output_file $labels";
+			$cmd = sprintf(
+				'%s -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=%s %s',
+				escapeshellarg($ghostScript_Path),
+				escapeshellarg($output_file),
+				escapeshellarg($labels)
+			);
+
 			$output = shell_exec($cmd);
 			$filepath = BP.DIRECTORY_SEPARATOR.'pub'.DIRECTORY_SEPARATOR.'media'.DIRECTORY_SEPARATOR.'sm_royalmail'.DIRECTORY_SEPARATOR.'ShippingLabels.pdf';
 			$downloadedFileName = 'ShippingLabels.pdf';
