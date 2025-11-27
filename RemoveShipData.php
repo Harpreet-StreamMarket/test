@@ -12,6 +12,7 @@
 
 namespace StreamMarket\RoyalMailShipping\Model;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\Filesystem\Driver\File;
 
 class RemoveShipData
 {
@@ -31,11 +32,13 @@ class RemoveShipData
 	
 	public function __construct(
             \StreamMarket\RoyalMailShipping\Model\TransactionFactory $transactionFactory,
-			\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+			\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+			File $fileDriver
             )
     {
         $this->transactionFactory = $transactionFactory;
 		$this->scopeConfig = $scopeConfig;
+		$this->fileDriver = $fileDriver;
     }
 
     public function execute()
@@ -48,26 +51,15 @@ class RemoveShipData
 			 $transactions = $this->transactionFactory->create()->getCollection()->addFieldToSelect('id')->addFieldToSelect('label_file')->addFieldToSelect('created_at');
 			 $transactions->addFieldToFilter('created_at', ['lteq' => $days_ago]);
 			 $data = $transactions->getData();
-			 // Example: get list of existing files in the allowed directory
-				$allowedDir = BP . '/media/';
-				$allowedFiles = scandir($allowedDir); // or generate programmatically
-
-				foreach ($data as $shipdata) {
-					$labelFile = basename($shipdata['label_file'] ?? '');
-					$id = $shipdata['id'] ?? null;
-
-					if (!$labelFile || !$id) {
-						continue;
-					}
-
-					// Only delete if it's in the allowed files list
-					if (in_array($labelFile, $allowedFiles, true)) {
-						unlink($allowedDir . $labelFile);
-					}
-
-					$this->deleteRows($id);
-				}
-
+			 foreach($data as $shipdata){
+			 $label_file = $shipdata['label_file'];
+			 $id = $shipdata['id'];
+			 $file_to_delete = BP.'/media'.$label_file;
+			 $this->deleteRows($id);
+			if(file_exists($file_to_delete)){
+				$this->fileDriver->deleteFile($file_to_delete);
+			}
+		}
 		}else{
 			echo "Enable Remove Lables";
 			
