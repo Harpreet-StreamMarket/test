@@ -542,26 +542,8 @@ class Carrier extends AbstractCarrier
         if (function_exists("exec")) {
             //ghostscript command
             $command = $this->getConfigData('ghscript'); //"gswin64";
-            $cmd = [
-				$command,
-				'-sDEVICE=pdfwrite',
-				'-dAutoRotatePages=/None',
-				'-dCompatibilityLevel=1.6',
-				'-dNOPAUSE',
-				'-dQUIET',
-				'-dBATCH',
-				'-sOutputFile=' . $outputPdfFile,
-				$sourcePdfFile
-			];
-
-			// Escape every argument
-			$escapedParts = array_map('escapeshellarg', $cmd);
-
-			// Join into final command
-			$safeCommand = implode(' ', $escapedParts);
-
-			exec($safeCommand, $output);
-
+            exec("$command -sDEVICE=pdfwrite -dAutoRotatePages=/None -dCompatibilityLevel=1.6 -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputPdfFile $sourcePdfFile",
+                    $output);
             if (file_exists($outputPdfFile)) {
                 return $outputPdfFile;
             }
