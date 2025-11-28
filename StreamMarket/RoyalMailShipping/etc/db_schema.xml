@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="sm_royalmail_matrixrate" resource="default" engine="innodb" comment="Royal Mail Rate Table">
+        <column xsi:type="int" name="pk" padding="10" unsigned="true" nullable="false" identity="true" comment="Primary key"/>
+        <column xsi:type="int" name="website_id" nullable="false" default = "0" comment="Website Id"/>
+        <column xsi:type="varchar" name="dest_country_id" length="4" nullable="false" default = "0" comment="Destination coutry ISO/2 or ISO/3 code"/>
+        <column xsi:type="int" name="dest_region_id" nullable="false" default = "0" comment="Destination Region Id"/>
+        <column xsi:type="varchar" name="dest_city" nullable="false" length="30" default = "*" comment="Destination City"/>
+        <column xsi:type="varchar" name="dest_zip" nullable="false" length="10" default = "*" comment="Destination Post Code (Zip)"/>
+        <column xsi:type="varchar" name="dest_zip_to" nullable="false" length="10" default = "*" comment="Destination Post Code (Zip)"/>
+        <column xsi:type="varchar" name="condition_name" nullable="false" length="20" comment="Rate Condition name"/>
+        <column xsi:type="decimal" name="condition_from_value" nullable="false" scale="4" precision="12" default = "0.0000" comment="Rate condition from value"/>
+        <column xsi:type="decimal" name="condition_to_value" nullable="false" scale="4" precision="12" default = "0.0000" comment="Rate condition to value"/>
+        <column xsi:type="decimal" name="price" nullable="false" scale="4" precision="12" default = "0.0000" comment="Price"/>
+        <column xsi:type="decimal" name="cost" nullable="false" scale="4" precision="12" default = "0.0000" comment="Cost"/>
+        <column xsi:type="varchar" name="delivery_type" nullable="false" length="255" default = "" comment="Service Offering"/>
+        <column xsi:type="varchar" name="delivery_type_code" nullable="false" length="255" default = "" comment="Service Offering Code"/>
+        <column xsi:type="varchar" name="service_type_code" nullable="false" length="255" default = "" comment="Service Type Code"/>
+        <column xsi:type="varchar" name="method_code" nullable="false" length="255" default = "" comment="Method Code"/>
+        <column xsi:type="int" name="is_active" padding="2" default = "0" nullable="false" comment="Is Active"/>
+        <column xsi:type="timestamp" name="created_at" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" comment="Updated At"/>        
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="pk"/>
+        </constraint>      
+        <constraint xsi:type="unique" referenceId="SM_ROYALMAIL_MATRIXRATE_WEBSITE_ID_DEST_COUNTRY_ID_DEST_REGION_ID_DEST_CITY_DEST_ZIP_DEST_ZIP_TO_CONDITION_NAME_CONDITION_FROM_VALUE_CONDITION_TO_VALUE_DELIVERY_TYPE_DELIVERY_TYPE_CODE_SERVICE_TYPE_CODE">
+            <column name="website_id"/>
+            <column name="dest_country_id"/>
+            <column name="dest_region_id"/>
+            <column name="dest_city"/>
+            <column name="dest_zip"/>
+            <column name="dest_zip_to"/>
+            <column name="condition_name"/>
+            <column name="condition_from_value"/>
+            <column name="condition_to_value"/>
+            <column name="delivery_type"/>
+            <column name="delivery_type_code"/>
+            <column name="service_type_code"/>
+        </constraint>
+    </table>
+	
+	<table name="sm_royalmail_token" resource="default" engine="innodb" comment="Safe place">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="Primary key"/>                
+        <column xsi:type="text" name="token_value" nullable="false" comment="Token Value"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Created At"/>
+		<column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+		<column xsi:type="int" name="cron_status" unsigned="true" nullable="false" comment="Cron Status"/>     
+		<column xsi:type="varchar" name="request_type" length="255" comment="Request Type"/>
+		<constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>        
+    </table>
+	
+    <table name="sm_royalmail_service_matrix" resource="default" engine="innodb" comment="Safe place">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="Primary key"/>                
+        <column xsi:type="varchar" name="service_type" nullable="false" length="10" comment="Service Type"/>
+        <column xsi:type="varchar" name="service_offering" length="10" comment="Service Offering"/>
+        <column xsi:type="varchar" name="service_format" length="10" comment="Service Format"/>
+        <column xsi:type="varchar" name="enhancement_type" length="10" default = "" comment="Service Enhancement type"/>
+        <column xsi:type="varchar" name="signature" length="10" default = "" comment="Signature Tracked products only"/>
+        <column xsi:type="int" name="safe_place_available" padding="2" comment="Safe place"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>        
+    </table>
+    
+    <table name="sm_royalmail_transactions" resource="default" engine="innodb" comment="Royalmail Transactions">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="Primary key"/>        
+        <column xsi:type="int" name="shipment_id" unsigned="true" nullable="false" comment="Shipment ID"/>     
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" comment="Order ID"/>     
+        <column xsi:type="varchar" name="transaction_id" length="255" comment="Transaction ID"/>
+        <column xsi:type="varchar" name="request_type" length="30" comment="Request Type"/>
+        <column xsi:type="varchar" name="service_offering_code" length="30" comment="Service Offering Code"/>
+        <column xsi:type="varchar" name="status" length="20" comment="Status"/>
+        <column xsi:type="varchar" name="message" comment="Message"/>
+        <column xsi:type="varchar" name="shipment_number" length="255" comment="Shipment Number"/>
+        <column xsi:type="varchar" name="label_file" length="255" comment="Label File"/>
+        <column xsi:type="varchar" name="image1DBarcode" length="255" comment="Image 1D Barcode"/>
+        <column xsi:type="varchar" name="image2DMatrix" length="255" comment="Image 2D Matrix"/>
+        <column xsi:type="int" name="manifest_batch_number" unsigned="true" comment="Manifest Batch Number"/>
+        <column xsi:type="int" name="manifested_in_batch" unsigned="true" comment="Manifested In Batch"/>
+        <column xsi:type="varchar" name="reference" length="255" comment="Reference"/>
+        <column xsi:type="varchar" name="request_xml" length="255" comment="Request XML"/>        
+        <column xsi:type="int" name="has_error" padding="2" nullable="false" default = "0" comment="Has Error"/>
+		<column xsi:type="int" name="custom_form" padding="2" nullable="false" default = "0" comment="cn23"/>
+        <column xsi:type="timestamp" name="created_at" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" comment="Updated At"/>
+		<column xsi:type="varchar" name="order_increment_id" length="255" comment="Order Increment Id"/>
+		<column xsi:type="varchar" name="shipment_increment_id" length="255" comment="Shipment Increment Id"/>
+		<column xsi:type="varchar" name="royalmail_shipment_id" length="255" comment="Royal Mail Shipment Id"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+    
+</schema>

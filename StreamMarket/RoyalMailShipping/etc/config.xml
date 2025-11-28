@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carriers>
+            <smroyalmail>
+                <active>0</active>
+                <title>RoyalMail Shipping</title>
+                <model>StreamMarket\RoyalMailShipping\Model\Carrier</model>
+                <gateway_url><![CDATA[https://api.proshipping.net/v4]]></gateway_url>
+                <tracking_url><![CDATA[https://www.royalmail.com/track-your-item?trackNumber=]]></tracking_url>
+                <sallowspecific>0</sallowspecific>
+                <version>2</version>
+                <specificerrmsg>This shipping method is currently unavailable. If you would like to ship using this shipping method, please contact us.</specificerrmsg>
+                <condition_name>package_weight</condition_name>
+                <outputFormat>PDF</outputFormat>
+                <localisedAddress>0</localisedAddress>
+                <max_package_weight>200</max_package_weight>
+                <min_package_weight>0.001</min_package_weight>
+                <unit_of_measure>KILOGRAM</unit_of_measure>
+                <generate_label_ongo>1</generate_label_ongo>
+                <containers>N,I_N,P,I_E</containers>
+                <zip_range>0</zip_range>
+                <ghscript>/usr/bin/gs</ghscript>
+                <allow_massaction>1</allow_massaction>
+                <throttling_wait_time>60</throttling_wait_time>
+                <manifest_automatically>0</manifest_automatically>
+                <manifest_time>16,00,00</manifest_time>
+                <manifest_frequency>D</manifest_frequency>
+                <manifest_description>Manifested automatically by cron.</manifest_description><!--Max lenght 40-->
+                <smdata><![CDATA[c2c5d36a32bbcacf31ba78cfba8abd39]]></smdata>
+				<smroyalmail_item>
+				<othercharges>0</othercharges>
+				<quotedlandedcost>0</quotedlandedcost>
+				<exportlicence>false</exportlicence>
+				</smroyalmail_item>
+				<manifest_predefind_period>0 23 * * *</manifest_predefind_period>
+            </smroyalmail>
+			
+        </carriers>
+    </default>
+</config>

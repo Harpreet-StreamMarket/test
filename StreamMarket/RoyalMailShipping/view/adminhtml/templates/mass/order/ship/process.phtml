@@ -1,0 +1,71 @@
+<?php
+$orderIds = $this->getRequest()->getParam('order_ids');
+if (!is_array($orderIds)) {
+    $orderIds = explode(',', $orderIds);
+}
+$countOrders = count($orderIds);
+?>
+<div id="messages" class="messages">
+    <div class="message message-note">
+        <?php echo __('Starting bulk shipment, please wait...') ?>
+    </div>
+    <div class="message message-note">
+        <?php echo __('Warning: Please do not close the window during execution.') ?>
+    </div>
+</div>
+<div class="message" id="process-loading" style="display: none">
+    <img src="<?php echo $this->getViewFileUrl('StreamMarket_RoyalMailShipping::images/ajax-loader.gif'); ?>" /> <?php echo __('Processing ...') ?>
+</div>
+<div class="message message-text" id="process-end" style="display: none">
+<?php echo __('Finished bulk shipment execution.') ?>
+    <a href="<?php echo $this->getUrl('sales/order/index', array()); ?>"> <?php echo __('Go Back') ?> </a>
+    &nbsp;&nbsp;<a target="_blank" title="<?php echo __('Print All Labels') ?>" href="<?php echo $this->getUrl('*/*/printAllLabels',
+        array('order_ids' => implode(',', $orderIds))) ?>"><?php echo __('Print All Labels') ?></a>
+</div>
+<script>
+    var orderidsArray = <?php echo json_encode($orderIds); ?>;
+    var length = orderidsArray.length;
+    var index = 0;
+    var service_offering = '<?php echo $this->getRequest()->getParam('service_offering'); ?>';
+    var service_type = '<?php echo $this->getRequest()->getParam('service_type'); ?>';
+    var container_type = '<?php echo $this->getRequest()->getParam('container_type'); ?>';
+    var oldurl = "<?php echo $this->getUrl('sales/order/index', array()); ?>";
+    var url = "<?php echo $this->getUrl('*/order/ship',
+        array('notify_customer' => $this->getRequest()->getParam('notify_customer'))); ?>";
+
+    require([
+        "jquery",
+        "prototype"
+    ],
+            function (jQuery, $) {
+
+                function callShipment() {
+                    if (index < length) {
+                        jQuery('#process-loading').show();
+                        var orderid = orderidsArray[index];
+                        jQuery('#messages').append('<div class="message message-note">Processing Order ID: ' + orderid + "  </div>");
+                        new Ajax.Request(url + 'order_id/' + orderid + '/service_offering/' + service_offering + '/service_type/' + service_type + '/container_type/' + container_type,
+                                {
+                                    method: "get",
+                                    onSuccess: function (res) {
+                                        var resonsedata = JSON.parse(res.responseText);
+                                        if (resonsedata.success) {
+                                            jQuery('#messages').append('<div class="message message-success" style="background-color:#DDF; "><?php echo __('Processing Completed of Order Id') ?>: ' + orderid + " </br>" + resonsedata.message + "</div>");
+                                        } else {
+                                            jQuery('#messages').append('<div class="message message-error" style="background-color:#de5400; "><?php echo __('Processing Completed of Order Id') ?>: ' + orderid + " </br>" + resonsedata.message + "</div>");
+                                        }
+                                        index++;
+                                        callShipment();
+                                    }
+                                });
+                    } else {
+                        jQuery('#process-loading').hide();
+                        jQuery('#process-end').show();
+                    }
+                }
+                jQuery(document).ready(function (jQuery) {
+                    callShipment();
+                });
+                return;
+            });
+</script>

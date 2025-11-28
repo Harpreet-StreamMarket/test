@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <!--configuration menu-->
+        <add id="StreamMarket_RoyalMailShipping::smroyalmail_config" 
+             title="Royal Mail"
+             translate="title"
+             module="StreamMarket_RoyalMailShipping" 
+             dependsOnModule="StreamMarket_RoyalMailShipping"
+             sortOrder="105"
+             parent="Magento_Backend::stores" 
+             resource="StreamMarket_RoyalMailShipping::royalmail_config"/>
+        <add id="StreamMarket_RoyalMailShipping::rates" title="Configure Shipping Rates" 
+             module="StreamMarket_RoyalMailShipping" sortOrder="1" parent="StreamMarket_RoyalMailShipping::smroyalmail_config" 
+             action="smroyalmail/rate/index" resource="StreamMarket_RoyalMailShipping::rates" />
+        
+        <!--<add id="StreamMarket_RoyalMailShipping::matrix" title="Service Matrix" 
+             module="StreamMarket_RoyalMailShipping" sortOrder="3" parent="StreamMarket_RoyalMailShipping::smroyalmail_config" 
+             action="smroyalmail/service/matrix" resource="StreamMarket_RoyalMailShipping::settings" />-->
+        <add id="StreamMarket_RoyalMailShipping::settings" title="Shipping Settings" 
+             module="StreamMarket_RoyalMailShipping" sortOrder="4" parent="StreamMarket_RoyalMailShipping::smroyalmail_config" 
+             action="adminhtml/system_config/edit/section/carriers/" resource="StreamMarket_RoyalMailShipping::settings" />
+        <!--sales menu-->
+        <add id="StreamMarket_RoyalMailShipping::smroyalmail" 
+             title="Royal Mail"
+             translate="title"
+             module="StreamMarket_RoyalMailShipping" 
+             dependsOnModule="StreamMarket_RoyalMailShipping"
+             sortOrder="100"
+             parent="Magento_Sales::sales" 
+             resource="StreamMarket_RoyalMailShipping::royalmail"/>
+        <add id="StreamMarket_RoyalMailShipping::shipments" title="Shipments" 
+             module="StreamMarket_RoyalMailShipping" sortOrder="1" parent="StreamMarket_RoyalMailShipping::smroyalmail" 
+             action="smroyalmail/shipment/index" resource="StreamMarket_RoyalMailShipping::shipments" />
+        <add id="StreamMarket_RoyalMailShipping::manifests" title="Manifests" 
+             module="StreamMarket_RoyalMailShipping" sortOrder="2" parent="StreamMarket_RoyalMailShipping::smroyalmail" 
+             action="smroyalmail/manifest/index" resource="StreamMarket_RoyalMailShipping::manifests" />
+        <!--<add id="StreamMarket_RoyalMailShipping::transactions" title="Transactions" 
+             module="StreamMarket_RoyalMailShipping" sortOrder="3" parent="StreamMarket_RoyalMailShipping::smroyalmail" 
+             action="smroyalmail/transaction/index" resource="StreamMarket_RoyalMailShipping::transactions" />-->
+    </menu>
+</config>

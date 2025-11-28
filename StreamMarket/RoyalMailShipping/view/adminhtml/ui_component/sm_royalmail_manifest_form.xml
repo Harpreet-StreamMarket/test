@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">sm_royalmail_manifest_form.sm_royalmail_manifest_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Page Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save" class="StreamMarket\RoyalMailShipping\Block\Adminhtml\Manifest\SaveButton"/>
+            <button name="reset" class="StreamMarket\RoyalMailShipping\Block\Adminhtml\Rate\Edit\ResetButton"/>
+            <button name="back" class="StreamMarket\RoyalMailShipping\Block\Adminhtml\Rate\Edit\BackButton"/>
+        </buttons>
+        <namespace>sm_royalmail_manifest_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>sm_royalmail_manifest_form.sm_royalmail_manifest_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="sm_royalmail_manifest_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="smroyalmail/manifest/createPost"/>
+        </settings>
+        <dataProvider class="StreamMarket\RoyalMailShipping\Model\Manifest\DataProvider" name="sm_royalmail_manifest_form_data_source">
+            <settings>
+                <requestFieldName>transaction_id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">false</item>
+                <item name="label" xsi:type="string" translate="true">Manifest Details</item>
+                <item name="sortOrder" xsi:type="number">20</item>
+            </item>
+        </argument>
+		<field name="menifestoffering_code" sortOrder="20" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+				<item name="additionalClasses" xsi:type="string">menifestcode</item>
+                    <item name="label" xsi:type="string" translate="true">Select Menifest</item>
+                    <item name="source" xsi:type="string">manifest</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>manifest</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="StreamMarket\RoyalMailShipping\Model\Config\Source\MenifestAvailable"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+		<field name="service_offering_code" sortOrder="30" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+				<item name="additionalClasses" xsi:type="string">servicecode</item>
+                    <item name="label" xsi:type="string" translate="true">Service Offering</item>
+                    <item name="source" xsi:type="string">manifest</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>manifest</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="StreamMarket\RoyalMailShipping\Model\Carrier\Source\EnabledMethods"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+		<field name="shipment_status" sortOrder="40" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+				<item name="additionalClasses" xsi:type="string">shipmentstatus</item>
+                    <item name="label" xsi:type="string" translate="true">Shipment Status</item>
+                    <item name="source" xsi:type="string">manifest</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>manifest</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="StreamMarket\RoyalMailShipping\Model\Config\Source\ShipmentStatus"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="reference" sortOrder="50" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Comment</item>
+                    <item name="source" xsi:type="string">manifest</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="notice" xsi:type="string" translate="true">Max length 24 characters. Included on the Customer Collection Receipt.</item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+</form>

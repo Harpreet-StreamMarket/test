@@ -1,0 +1,93 @@
+<?php
+$helper_data = $this->helper('StreamMarket\RoyalMailShipping\Helper\CurlRequest');
+$base_url = $helper_data->getBaseUrl();
+$admin_path = $this->helper('Magento\Backend\Helper\Data')->getAreaFrontName();
+$admin_url_prepare = $base_url.$admin_path;
+?>
+<div class="admin__field">
+	<label class="admin__field-label"></label>
+	<div class="admin__field-control">
+		<input type="hidden" name="hideit" id="hideit" value="" />
+		<button type="submit" title="Submit" id="proceed-btn" class="action submit primary">
+			<span><?php echo __('Proceed') ?></span>
+		</button>
+		<div class="ajax_loader" style="display:none">
+	<img id="ajax_loader" src="<?php echo $this->getViewFileUrl('StreamMarket_RoyalMailShipping::images/ajax-loader.gif'); ?>" />
+	<?php echo __('Processing ...') ?></div>
+	</div>
+</div>
+										
+    <script>
+		require(["jquery"],function($) {
+			 $(document).ready(function() {
+				$(document).on('change','.menifestcode select', function(){    
+					var value = $(this).val();  
+					if(value == 'service_code'){
+					   $('.servicecode').show();
+					}else{
+						$('.servicecode').hide();
+					}	
+					if(value == 'shipping_status'){
+					   $('.shipmentstatus').show();
+					}else{
+						$('.shipmentstatus').hide();
+					}			
+									
+				});
+			
+			$("#proceed-btn").click(function () {
+				
+				var menifest_offering = $('.menifestcode select').val();
+				var service_offering = null;
+				var shipping_status = null;
+				var reference = $('.admin__control-text').val();
+					if(menifest_offering == 'service_code'){
+						var service_offering = $('.servicecode select').val();
+					}
+					if(menifest_offering == 'shipping_status'){
+						var shipping_status = $('.shipmentstatus select').val();
+					}
+				
+				$('.ajax_loader').show();
+				var customurl = "<?php echo $admin_url_prepare; ?>/smroyalmail/shipment/CreateManifest";
+				$.ajax({
+					url: customurl,
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						menifest_offering: menifest_offering,
+						service_offering: service_offering,
+						shipping_status: shipping_status,
+						reference:reference
+					},
+				complete: function(response) {             
+					$('.ajax_loader').hide();
+					location.reload();
+					
+					},
+					error: function (xhr, status, errorThrown) {
+						console.log('Error happens. Try again.');
+					}
+				});
+			   
+			});
+			});
+	});			
+    </script>
+	<style>
+	#proceed-btn {
+    float: left;
+    margin-right: 10px;
+}
+.fieldset-wrapper-title {
+    display: none;
+}
+.admin__field.servicecode{
+    display: none;
+	
+}
+.shipmentstatus{
+    display: none;
+	
+}
+	</style>

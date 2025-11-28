@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>          
+        <referenceContainer name="left">
+            <referenceBlock name="sales_order_tabs">
+                <block class="StreamMarket\RoyalMailShipping\Block\Adminhtml\Order\View\Tab\Transactions" name="smroyalmail_transactions.grid.container"/>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">smroyalmail_transactions</argument>
+                    <argument name="block" xsi:type="string">smroyalmail_transactions.grid.container</argument>
+                </action>
+            </referenceBlock>
+        </referenceContainer>
+        <referenceBlock name="smroyalmail_transactions.grid.container">
+            <uiComponent name="sm_order_transactions_list"/>
+        </referenceBlock>
+    </body>
+</page>

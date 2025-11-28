@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="StreamMarket\RoyalMailShipping\Api\Data\RateInterface" type="StreamMarket\RoyalMailShipping\Model\Carrier\Rate" />
+    <preference for="StreamMarket\RoyalMailShipping\Api\RateRepositoryInterface" type="StreamMarket\RoyalMailShipping\Model\Carrier\RateRepository" />
+    <virtualType name="ServiceMatrixGridCollection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">sm_royalmail_service_matrix</argument>
+            <argument name="resourceModel" xsi:type="string">StreamMarket\RoyalMailShipping\Model\ResourceModel\Service\Matrix</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="service_matrix_list_data_source" xsi:type="string">ServiceMatrixGridCollection</item>
+            </argument>
+        </arguments>
+    </type>
+    
+    <virtualType name="SMRateListGridCollection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">sm_royalmail_matrixrate</argument>
+            <argument name="resourceModel" xsi:type="string">StreamMarket\RoyalMailShipping\Model\ResourceModel\Carrier\Rate</argument>
+            <argument name="identifierName" xsi:type="string">pk</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="sm_rm_rate_list_data_source" xsi:type="string">SMRateListGridCollection</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="transaction_list_data_source" xsi:type="string">StreamMarket\RoyalMailShipping\Model\ResourceModel\Order\Transactions\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="sensitive" xsi:type="array">
+                <item name="carriers/smroyalmail/client_id" xsi:type="string">1</item>
+                <item name="carriers/smroyalmail/client_secret" xsi:type="string">1</item>
+                <item name="carriers/smroyalmail/application_id" xsi:type="string">1</item>
+                <item name="carriers/smroyalmail/api_user" xsi:type="string">1</item>
+                <item name="carriers/smroyalmail/api_password" xsi:type="string">1</item>
+            </argument>
+        </arguments>
+    </type>    
+    <type name="Magento\Framework\View\Element\UiComponent\Argument\Interpreter\ConfigurableObject">
+        <arguments>
+            <argument name="classWhitelist" xsi:type="array">
+                <item name="0" xsi:type="string">Magento\Framework\Data\OptionSourceInterface</item>
+                <item name="1" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProviderInterface</item>
+                <item name="2" xsi:type="string">Magento\Framework\View\Element\UiComponent\ContextInterface</item>
+            </argument>
+        </arguments>
+    </type>
+	<type name="Magento\Framework\Console\CommandList">
+       <arguments>
+           <argument name="commands" xsi:type="array">
+               <item name="massManifesr" xsi:type="object">StreamMarket\RoyalMailShipping\Console\EODProcess</item>
+           </argument>
+       </arguments>
+   </type>
+    <virtualType name="BackOrderOrderViewProvider" type="Magento\Framework\View\Element\UiComponent\DataProvider\FilterPool">
+        <arguments>
+            <argument name="appliers" xsi:type="array">
+                <item name="regular" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\RegularFilter</item>
+                <item name="fulltext" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\FulltextFilter</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    
+    <virtualType name="BackOrderOrderViewProvider" type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+        <arguments>
+            <argument name="collection" xsi:type="object" shared="false">StreamMarket\RoyalMailShipping\Model\ResourceModel\Order\Transactions\Grid\Collection</argument>
+            <argument name="filterPool" xsi:type="object" shared="false">BackOrderOrderViewProvider</argument>
+        </arguments>
+    </virtualType>
+</config>

@@ -1,0 +1,27 @@
+{
+    "name": "StreamMarket/royalmail-shipping",
+    "description": "Royal Mail Shipping module",
+    "require": {
+        "magento/module-sales": "101.*.*"
+    },
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": [
+        "Commercial"
+    ],
+    "authors": [
+        {
+            "name": "StreamMarket",
+            "email": "support@StreamMarket.co.uk",
+            "homepage": "https://StreamMarket.co.uk/"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "StreamMarket\\RoyalMailShipping\\": ""
+        }
+    }
+}

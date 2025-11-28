@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">royalmail_rate_form_new.royalmail_rate_form_new_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Page Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save_and_continue" class="StreamMarket\RoyalMailShipping\Block\Adminhtml\Rate\Edit\SaveAndContinueButton"/>
+            <button name="save" class="StreamMarket\RoyalMailShipping\Block\Adminhtml\Rate\Edit\SaveButton"/>
+            <button name="reset" class="StreamMarket\RoyalMailShipping\Block\Adminhtml\Rate\Edit\ResetButton"/>
+            <button name="delete" class="StreamMarket\RoyalMailShipping\Block\Adminhtml\Rate\Edit\DeleteButton"/>
+            <button name="back" class="StreamMarket\RoyalMailShipping\Block\Adminhtml\Rate\Edit\BackButton"/>
+        </buttons>
+        <namespace>royalmail_rate_form_new</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>royalmail_rate_form_new.royalmail_rate_form_new_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="royalmail_rate_form_new_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="smroyalmail/rate/save"/>
+        </settings>
+        <dataProvider class="StreamMarket\RoyalMailShipping\Model\Carrier\Rate\DataProvider" name="royalmail_rate_form_new_data_source">
+            <settings>
+                <requestFieldName>rate_id</requestFieldName>
+                <primaryFieldName>pk</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label/>
+        </settings>
+        <field name="pk" formElement="hidden">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">pk</item>
+                    <item name="label" xsi:type="string" translate="true">ID</item>
+                </item>
+            </argument>
+        </field>
+        <field name="is_active" sortOrder="1" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Is Active</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="allowed_country" sortOrder="10" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">StreamMarket\RoyalMailShipping\Model\Config\Source\AllowedCountry</item>
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Apply To</item>
+                    <item name="component" xsi:type="string">StreamMarket_RoyalMailShipping/js/form/element/select/allowedCountryOptions</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">number</item>
+                    <item name="source" xsi:type="string">item</item>
+                    <item name="dataScope" xsi:type="string">allowed_country</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="dest_country_id" sortOrder="20" formElement="multiselect">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Select Country</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="disabled" xsi:type="boolean">true</item>
+                    <item name="visibleValue" xsi:type="string">1</item>
+                    <item name="dataScope" xsi:type="string">dest_country_id</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Locale\Country"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="dest_region_id" sortOrder="30" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Region/State</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="notice" xsi:type="string" translate="true">Leave empty or fill 0 for all regions.</item>
+                </item>
+            </argument>
+        </field>
+        <field name="dest_city" sortOrder="40" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">City</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="notice" xsi:type="string" translate="true">Leave empty for all.</item>
+                </item>
+            </argument>
+        </field>
+        <field name="dest_zip" sortOrder="50" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Zip/Postal Code From</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="notice" xsi:type="string" translate="true">Leave empty for all.</item>
+                </item>
+            </argument>
+        </field>
+        <field name="dest_zip_to" sortOrder="51" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Zip/Postal Code To</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="notice" xsi:type="string" translate="true">Leave empty for all.</item>
+                </item>
+            </argument>
+        </field>
+        <field name="condition_name" sortOrder="60" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Condition Name</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <dataScope>condition_name</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="StreamMarket\RoyalMailShipping\Model\Carrier\Source\Conditions"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="condition_from_value" sortOrder="70" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Condition From Value</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                </item>
+            </argument>
+        </field>
+        <field name="condition_to_value" sortOrder="71" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Condition To Value</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                </item>
+            </argument>
+        </field>
+        <field name="price" sortOrder="80" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Price</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="dataType" xsi:type="string">number</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                        <item name="validate-number" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="notice" xsi:type="string" translate="true">In base currency.</item>
+                </item>
+            </argument>
+        </field>
+        <field name="delivery_type_code" sortOrder="100" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Service Offering</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="component" xsi:type="string">StreamMarket_RoyalMailShipping/js/form/element/select/deliveryTypeCode</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <dataScope>delivery_type_code</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="StreamMarket\RoyalMailShipping\Model\Carrier\Source\EnabledMethods"/>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="delivery_type" sortOrder="110" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Service Title</item>
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                </item>
+            </argument>
+        </field>
+        <field name="website_id" sortOrder="200" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">rate</item>
+                    <item name="default" xsi:type="number">1</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Website</label>
+                <dataScope>website_id</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Config\Model\Config\Source\Website"/>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        
+    </fieldset>
+</form>

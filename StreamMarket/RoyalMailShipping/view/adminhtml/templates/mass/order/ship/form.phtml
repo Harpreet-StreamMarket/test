@@ -1,0 +1,209 @@
+<?php
+$helper = $this->helper('StreamMarket\RoyalMailShipping\Helper\CurlRequest');
+$service_offering = $helper->getSystemConfigValue('carriers/smroyalmail/smroyalmail_item/service_offering');
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+$service_off_data = $objectManager->get('StreamMarket\RoyalMailShipping\Model\Config\Source\ServiceOffering');
+$conf = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue('carriers/smroyalmail/allowed_methods');
+$data = $service_off_data->toOptionArray();
+
+//$base_url = $helper->getBaseUrl();
+$base_url = $this->helper('Magento\Backend\Helper\Data')->getAreaFrontName();
+$ids = [];
+$incrementIds = [];
+foreach ($this->getSelectedOrders() as $info):
+    $ids[] = $info->getEntityId();
+    $incrementIds[] = $info->getIncrementId();
+endforeach;
+
+$store_allowed = explode(',',$conf);
+foreach($data as $dataVal){
+	foreach($store_allowed as $val){
+		if($val == $dataVal['value']){
+	    $allowed_methods[] = array('value' => $dataVal['value'],'label' => $dataVal['label']);
+		}
+	}
+}
+?>
+
+<div class="entry-edit form-inline">
+        <div class="fieldset-wrapper">
+            <div class="admin__fieldset-wrapper-content">
+                <fieldset class="admin__fieldset">
+                    <input type="hidden" name="form_key" value="<?php echo $this->getFormKey(); ?>"/>
+                    <input type="hidden" name="order_ids" value="<?php
+                    echo implode(',', $ids);
+                    ?>"/>
+                    <div class="admin__field">
+                        <label class="admin__field-label">
+                            <span><?php echo __('Service Offering') ?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <select id="delivery_type_code" name="service_offering" data-validate='{"required":true}' class="admin__control-select">
+							<option value="" selected="selected"><?php echo __('--Please Select--') ?></option>
+                                                <?php foreach($allowed_methods as $val): ?>
+												<option value="<?= $val['value']; ?>"><?= $val['label']; ?></option>
+												<?php endforeach; ?>
+                                            </select>
+                        </div>
+                    </div>
+					<div class="admin__field _required">
+                        <label class="admin__field-label">
+                            <span><?php echo __('Container Type') ?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <select id="container_type" name="container_type" data-validate='{"required":true}' class="admin__control-select">
+                                <option value="" selected="selected"><?php echo __('--Please Select--') ?></option>
+                            </select>
+                        </div>
+                    </div>
+					  <div class="admin__field">
+                        <label class="admin__field-label">
+                            <span><?php echo __('Notify Customer') ?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <select id="notify_customer" name="notify_customer" class="admin__control-select">
+                                <option value="0"><?php echo __('No') ?></option>
+                                <option value="1"><?php echo __('Yes') ?></option>
+                            </select>
+                        </div>
+                    </div>
+					<div class="admin__field">
+                        <label class="admin__field-label">
+                            <span><?php echo __('Signed For') ?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <select id="signed_for" name="signed_for" class="admin__control-select">
+                                <option value="0"><?php echo __('No') ?></option>
+                                <option value="1"><?php echo __('Yes') ?></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="admin__field">
+                        <label class="admin__field-label">
+                            <span><?php echo __('Selected Orders') ?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <?php echo implode(', ', $incrementIds); ?>
+                        </div>
+                    </div>
+					<div class="admin__field"></div>
+                    <div class="admin__field">
+                        <label class="admin__field-label"></label>
+                        <div class="admin__field-control">
+                            <input type="hidden" name="hideit" id="hideit" value="" />
+                            <button style="margin-bottom: 25px;" title="Submit" class="action submit primary" id="proceed-btn">
+                                <span><?php echo __('Proceed') ?></span>
+                            </button>
+							<div class="ajax_loader" style="display:none">
+									<img id="ajax_loader" src="<?php echo $this->getViewFileUrl('StreamMarket_RoyalMailShipping::images/ajax-loader.gif'); ?>" />
+									<?php echo __('Processing ...') ?></div>
+                        </div>
+						
+                    </div>
+					
+					<div class="admin__field">
+					<div id="messages" class="messages">
+    <div class="message message-note">
+        <?php echo __('Starting bulk shipment, please wait...') ?>
+    </div>
+    <div class="message message-note">
+        <?php echo __('Warning: Please do not close the window during execution.') ?>
+    </div>
+</div>
+<div class="message" id="process-loading" style="display: none">
+    <img src="<?php echo $this->getViewFileUrl('StreamMarket_RoyalMailShipping::images/ajax-loader.gif'); ?>" /> <?php echo __('Processing ...') ?>
+</div>
+<div class="message message-text" id="process-end" style="display: none">
+<?php echo __('Finished bulk shipment execution.') ?>
+    <a href="<?php echo $this->getUrl('sales/order/index'); ?>"> Go Back </a>
+	<a target="_blank" title="<?php echo __('Print All Labels') ?>" href="<?php echo $this->getUrl('*/*/printAllLabels',
+        array('order_ids' => implode(',', $ids))) ?>"><?php echo __('Print All Labels') ?></a>
+</div>
+                </fieldset>
+            </div>
+        </div>
+   </div>
+<script>
+    var orderidsArray = <?php echo json_encode($incrementIds); ?>;
+    var length = orderidsArray.length;
+    var index = 0;
+    var url = "<?php echo $this->getUrl('smroyalmail/shipment/CreateMassShipment'); ?>";
+	var container_url = "<?php echo $this->getUrl('smroyalmail/shipment/GetContainerType'); ?>";
+
+    require([
+        "jquery",
+        "prototype"
+    ],
+   function (jQuery, $) {
+	   jQuery(".message-note").hide();
+			jQuery(".message-text").hide();
+			
+			jQuery('#delivery_type_code').change(function () {
+                 var val = jQuery(this).val();
+				   new Ajax.Request(container_url + 'code/' + val,
+                                {
+                                    method: "get",
+                                    onSuccess: function (response) {
+										jQuery("#container_type").html(response.responseJSON.html);
+                                    }
+                                });
+							});
+		jQuery("#proceed-btn").click(function () {
+                function callShipment() {
+                    if (index < length) {
+						var service_offering = jQuery('#delivery_type_code').val();
+						var notify_customer = jQuery('#notify_customer').val();
+						var parcel_type = jQuery('#container_type').val();
+						var signed_for = jQuery('#signed_for').val();
+                        jQuery('#process-loading').show();
+						jQuery('#proceed-btn').hide();
+						setTimeout(function(){ jQuery(".message-note").show(); }, 1000);
+                        var orderid = orderidsArray[index];
+                        jQuery('#messages').append('<div class="message message-note">Processing Order ID: ' + orderid + "  </div>");
+						
+        new Ajax.Request(url + 'order_number/' + orderid + '/service_offering/' + service_offering + '/notify_customer/' + notify_customer + '/parcel_type/' + parcel_type + '/signed_for/' + signed_for,
+                                {
+                                    method: "get",
+                                    onSuccess: function (res) {
+										
+                                        var resonsedata = JSON.parse(res.responseText);
+										console.log(resonsedata);
+                                        if (resonsedata.status == 'ok') {
+                                            jQuery('#messages').append('<div class="message message-success" style="background-color:#DDF; "><?php echo __('Processing Completed of Order Id') ?>: ' + orderid + " </br>" + resonsedata.message + "</div>");
+                                        }
+										else if (resonsedata.status == 'rapeat') {
+                                            jQuery('#messages').append('<div class="message message-error" style="background-color:#de5400; "><?php echo __('Processing of Order Id') ?>: ' + orderid + " </br>" + resonsedata.message + "</div>");
+                                        }
+										else {
+                                            jQuery('#messages').append('<div class="message message-error" style="background-color:#de5400; "><?php echo __('Royal Mail Lable Not Generate of Order Id') ?>: ' + orderid + " </br>" + resonsedata.message + "</div>");
+                                        }
+                                        index++;
+                                        callShipment();
+                                    }
+                                });
+                    } else {
+                        jQuery('#process-loading').hide();
+                        jQuery('#process-end').show();
+                    }
+                }
+                jQuery(document).ready(function (jQuery) {
+                    callShipment();
+                });
+                return;
+            });
+			});
+</script>
+			
+			
+			<style>
+			.conversation {
+    clear: both;
+    text-align: center;
+    color: #000;
+    background: #de5400;
+    line-height: 50px;
+    width: 100%;
+	padding: 10px;
+}
+			</style>
