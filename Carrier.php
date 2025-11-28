@@ -13,7 +13,9 @@
 namespace StreamMarket\RoyalMailShipping\Model;
 
 use Magento\Framework\Exception\LocalizedException;
-
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Magento\Framework\Exception\LocalizedException;
 /**
  * Description of Carrier
  */
@@ -536,21 +538,53 @@ class Carrier extends AbstractCarrier
      */
     public function getCompatiblePdf($sourcePdfFile, $outputPdfFile)
     {
-        if (file_exists($outputPdfFile)) {
-            return $outputPdfFile;
-        }
-        if (function_exists("exec")) {
-            //ghostscript command
-            $command = $this->getConfigData('ghscript'); //"gswin64";
-            exec("$command -sDEVICE=pdfwrite -dAutoRotatePages=/None -dCompatibilityLevel=1.6 -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$outputPdfFile $sourcePdfFile",
-                    $output);
-            if (file_exists($outputPdfFile)) {
-                return $outputPdfFile;
-            }
-        } else {
-            throw new LocalizedException(__('Function exec() is not available. Unable to generate Zend_Pdf compatible label.'));
-        }
-        return false;
+        // If output PDF already exists, return it immediately
+		if (file_exists($outputPdfFile)) {
+			return $outputPdfFile;
+		}
+
+		// Get Ghostscript command from config
+		$command = $this->getConfigData('ghscript'); // e.g., "gswin64c.exe" or "/usr/bin/gs"
+
+		if (!file_exists($sourcePdfFile)) {
+			throw new LocalizedException(__('Source PDF file does not exist: %1', $sourcePdfFile));
+		}
+
+		if (empty($command) || !is_executable($command)) {
+			throw new LocalizedException(__('Ghostscript executable is not configured or not executable.'));
+		}
+
+		// Build the Ghostscript command as an array
+		$process = new Process([
+			$command,
+			'-sDEVICE=pdfwrite',
+			'-dAutoRotatePages=/None',
+			'-dCompatibilityLevel=1.6',
+			'-dNOPAUSE',
+			'-dQUIET',
+			'-dBATCH',
+			'-sOutputFile=' . $outputPdfFile,
+			$sourcePdfFile
+		]);
+
+		try {
+			// Run the process
+			$process->mustRun(); // Throws exception if command fails
+
+			// Optional: log output for debugging
+			$output = $process->getOutput();
+
+			if (file_exists($outputPdfFile)) {
+				return $outputPdfFile;
+			} else {
+				throw new LocalizedException(__('Ghostscript did not produce the output PDF.'));
+			}
+
+		} catch (ProcessFailedException $exception) {
+			throw new LocalizedException(__('Ghostscript process failed: %1', $exception->getMessage()));
+		}
+
+		return false;
     }
 
     /**
